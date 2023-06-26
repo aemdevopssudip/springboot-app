@@ -1,4 +1,4 @@
-pipeline {
+epipeline {
    tools {
         maven 'Maven3'
     }
@@ -37,12 +37,22 @@ pipeline {
         }
       }
 
-       stage('K8S Deploy') {
+       stage('K8S Pre-deploy') {
         steps{   
             script {
                 withKubeConfig([credentialsId: 'K8S', serverUrl: '']) {
                 sh 'curl -LO "https://storage.googleapis.com/kubernetes-release/release/v1.20.5/bin/linux/amd64/kubectl"'
                 sh 'chmod u+x ./kubectl'
+                sh './kubectl delete -f eks-deploy-k8s.yaml'
+                }
+            }
+        }
+       }
+
+       stage('K8S Deploy') {
+        steps{   
+            script {
+                withKubeConfig([credentialsId: 'K8S', serverUrl: '']) {
                 sh './kubectl apply -f eks-deploy-k8s.yaml'
                 }
             }
