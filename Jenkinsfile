@@ -1,4 +1,4 @@
-epipeline {
+pipeline {
    tools {
         maven 'Maven3'
     }
