@@ -1,10 +1,10 @@
 pipeline {
    tools {
-        maven 'Maven3'
+        maven 'Maven'
     }
-    agent any
+    agent {label 'slave-node-label'}
     environment {
-        registry = "514337728862.dkr.ecr.ap-northeast-1.amazonaws.com/sudip-26june-repo"
+        registry = "514337728862.dkr.ecr.us-west-2.amazonaws.com/test-repo"
     }
    
     stages {
@@ -31,8 +31,8 @@ pipeline {
     stage('Pushing to ECR') {
      steps{  
          script {
-                sh 'aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 514337728862.dkr.ecr.ap-northeast-1.amazonaws.com'
-                sh 'docker push 514337728862.dkr.ecr.ap-northeast-1.amazonaws.com/sudip-26june-repo:latest'
+                sh 'aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 514337728862.dkr.ecr.us-west-2.amazonaws.com'
+                sh 'docker push 514337728862.dkr.ecr.us-west-2.amazonaws.com/test-repo:latest'
          }
         }
       }
@@ -40,7 +40,7 @@ pipeline {
        stage('K8S Pre-deploy') {
         steps{   
             script {
-                withKubeConfig([credentialsId: 'K8S', serverUrl: '']) {
+                withKubeConfig([credentialsId: 'kubeconfig', serverUrl: '']) {
                 sh 'curl -LO "https://storage.googleapis.com/kubernetes-release/release/v1.20.5/bin/linux/amd64/kubectl"'
                 sh 'chmod u+x ./kubectl'
                 sh './kubectl delete -f eks-deploy-k8s.yaml'
@@ -49,14 +49,14 @@ pipeline {
         }
        }
 
-       stage('K8S Deploy') {
+      stage('K8S Deploy') {
         steps{   
             script {
-                withKubeConfig([credentialsId: 'K8S', serverUrl: '']) {
+                withKubeConfig([credentialsId: 'kubeconfig', serverUrl: '']) {
                 sh './kubectl apply -f eks-deploy-k8s.yaml'
                 }
             }
         }
-       }
+       } 
     }
 }
