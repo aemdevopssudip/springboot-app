@@ -43,6 +43,16 @@ pipeline {
                 withKubeConfig([credentialsId: 'K8S', serverUrl: '']) {
                 sh 'curl -LO "https://storage.googleapis.com/kubernetes-release/release/v1.20.5/bin/linux/amd64/kubectl"'
                 sh 'chmod u+x ./kubectl'
+                sh './kubectl delete -f deployment'
+                }
+            }
+        }
+       }
+
+      stage('K8S Deploy') {
+        steps{   
+            script {
+                withKubeConfig([credentialsId: 'K8S', serverUrl: '']) {
                 sh './kubectl apply -f deployment'
                 }
             }
