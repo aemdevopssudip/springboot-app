@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: default
+  namespace: sudip-deploy
   labels:
     app: springboot-app
   name: springboot-app
@@ -28,7 +28,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: default
+  namespace: sudip-deploy
   labels:
     app: springboot-app
     k8s-app: springboot-app
